@@ -1,14 +1,15 @@
 {
-	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "kvz-trutnov-prod",
-	"main": "./workers/app.ts",
-	"compatibility_date": "2025-10-08",
-	"compatibility_flags": ["nodejs_compat"],
-	"observability": {
-		"enabled": true
-	},
-	"upload_source_maps": true,
-	"vars": {
-		"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
-	}
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "kvz-trutnov-prod",
+  "main": "./workers/app.ts",
+  "compatibility_date": "2025-10-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  "vars": {
+    "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare",
+    "VITE_SANITY_WRITE_TOKEN": "skqt1ctdHhqpqScE7gdiUqNfqb6kAMH8rGx8OWdYfORa0K9ltD6a6VZg0pJ6NTKgJUHzfFrapaPaV2hnXzKXS598Ro9hi7utuM9hu3DPL85Xq6Za3xFNK9kcut9zELI8u29IhC85Fiz0nDmPqG67Z7VhcT6imzuJ8ZTgmg0biiOXqSAgPWHK"
+  }
 }
