@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Point to sitemap
+Sitemap: https://kvztrutnov2.cz/sitemap.xml
+
+# Prevent indexing of local-only or staging paths if any
+# Disallow: /staging/

@@ -1,16 +1,52 @@
-@import "tailwindcss" source(".");
+@import "tailwindcss";
 
 @theme {
-	--font-sans:
-		"Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* === FONTS === */
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --font-military:
+    "Rajdhani", "Roboto Condensed", ui-sans-serif, system-ui, sans-serif;
+
+  /* === MILITARY === */
+  --color-military-50: #f5f5f4;
+  --color-military-100: #e7e5e4;
+  --color-military-200: #d6d3d1;
+  --color-military-300: #a8a29e;
+  --color-military-400: #78716c;
+  --color-military-500: #5c5652;
+  --color-military-600: #44403c;
+  --color-military-700: #3a3632;
+  --color-military-800: #292524;
+  --color-military-900: #1c1917;
+
+  /* === OLIVE === */
+  --color-olive-50: #f6f6f4;
+  --color-olive-100: #e8e8e3;
+  --color-olive-200: #d4d4c8;
+  --color-olive-300: #b8b8a5;
+  --color-olive-400: #9a9a80;
+  --color-olive-500: #7d7d61;
+  --color-olive-600: #6b6b52;
+  --color-olive-700: #595947;
+  --color-olive-800: #4a4a3c;
+  --color-olive-900: #3d3d32;
+
+  /* === KHAKI === */
+  --color-khaki-50: #f9f8f5;
+  --color-khaki-100: #f0eee5;
+  --color-khaki-200: #e2ddc9;
+  --color-khaki-300: #cec5a6;
+  --color-khaki-400: #b8aa7f;
+  --color-khaki-500: #a69266;
+  --color-khaki-600: #8f7a53;
+  --color-khaki-700: #776345;
+  --color-khaki-800: #63533c;
+  --color-khaki-900: #554736;
 }
 
 html,
 body {
-	@apply bg-white dark:bg-gray-950;
-
-	@media (prefers-color-scheme: dark) {
-		color-scheme: dark;
-	}
+  @apply bg-white;
 }
