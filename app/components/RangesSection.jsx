@@ -11,7 +11,8 @@ export default function RangesSection() {
       id: 1,
       name: "Střední lesnická škola Trutnov",
       description: "Veřejná pistolová střelnice 2 x 25 m",
-      image_url: "http://kvztrutnov.xf.cz/img/strelnice/sls03.jpg",
+      image_url:
+        "https://strelnice.clatrutnov.cz/images/fotky/trutnov/strelnice-trutnov-5.jpg",
     },
     {
       id: 2,
@@ -24,13 +25,15 @@ export default function RangesSection() {
       id: 3,
       name: "SBTS Hostinné",
       description: "Střelnice 25 a 40 m",
-      image_url: "http://kvztrutnov.xf.cz/img/strelnice/host01.jpg",
+      image_url:
+        "https://lh6.googleusercontent.com/proxy/QGe87c4gWg9zyhXPevvxF1505rYSfK6qsUeKW0MANXWW5DmeETcWRgugTMxPhlw05JXaviAulwSteyXcZFz7TdWW",
     },
     {
       id: 4,
       name: "SSK Vrchlabí",
       description: "Veřejná střelnice 25 a 50 m",
-      image_url: "http://kvztrutnov.xf.cz/img/strelnice/vrchlabi01.jpg",
+      image_url:
+        "https://www.google.com/imgres?q=ssk%20vrchlab%C3%AD%20strelnice&imgurl=https%3A%2F%2Fd48-a.sdn.cz%2Fd_48%2Fc_img_QP_BK%2FQ83B68.jpeg%3Ffl%3Dres%2C1200%2C900%2C1&imgrefurl=https%3A%2F%2Fwww.firmy.cz%2Fdetail%2F13661477-strelnice-ssk-skoda-vrchlabi-vrchlabi.html&docid=OP7RUzs57Rs-jM&tbnid=-CqubLYcHyf-fM&vet=12ahUKEwjxp8e87-KSAxU9hP0HHdWPFmoQnPAOegQIGRAB..i&w=1200&h=872&hcb=2&ved=2ahUKEwjxp8e87-KSAxU9hP0HHdWPFmoQnPAOegQIGRAB",
     },
   ];
 
