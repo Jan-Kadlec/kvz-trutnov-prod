@@ -7,6 +7,7 @@ import RangesSection from "../components/RangesSection";
 import EventsSection from "../components/EventsSection";
 import ResultsSection from "../components/ResultSection";
 import ContactSection from "../components/ContactSection";
+import Footer from "../components/Footer";
 
 function App() {
   const [currentSection, setCurrentSection] = useState("home");
@@ -271,6 +272,7 @@ function App() {
         <ResultsSection />
         <ContactSection />
       </main>
+      <Footer />
     </div>
   );
 }
