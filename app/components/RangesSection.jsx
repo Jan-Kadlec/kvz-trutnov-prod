@@ -33,7 +33,7 @@ export default function RangesSection() {
       name: "SSK Vrchlabí",
       description: "Veřejná střelnice 25 a 50 m",
       image_url:
-        "https://www.google.com/imgres?q=ssk%20vrchlab%C3%AD%20strelnice&imgurl=https%3A%2F%2Fd48-a.sdn.cz%2Fd_48%2Fc_img_QP_BK%2FQ83B68.jpeg%3Ffl%3Dres%2C1200%2C900%2C1&imgrefurl=https%3A%2F%2Fwww.firmy.cz%2Fdetail%2F13661477-strelnice-ssk-skoda-vrchlabi-vrchlabi.html&docid=OP7RUzs57Rs-jM&tbnid=-CqubLYcHyf-fM&vet=12ahUKEwjxp8e87-KSAxU9hP0HHdWPFmoQnPAOegQIGRAB..i&w=1200&h=872&hcb=2&ved=2ahUKEwjxp8e87-KSAxU9hP0HHdWPFmoQnPAOegQIGRAB",
+        "https://d48-a.sdn.cz/d_48/c_img_QP_BK/Q83B68.jpeg?fl=res,1200,900,1",
     },
   ];
 

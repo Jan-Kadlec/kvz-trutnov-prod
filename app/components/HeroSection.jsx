@@ -14,7 +14,7 @@ export default function HeroSection({ onNavigate }) {
       <div
         className="absolute inset-0 bg-cover bg-center opacity-20"
         style={{
-          backgroundImage: "url('/hero-background.jpg')",
+          backgroundImage: "url('/strelba.jpg')",
         }}
         role="img"
         aria-hidden="true"

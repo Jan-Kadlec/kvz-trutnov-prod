@@ -77,8 +77,7 @@ export default function AboutSection() {
             <div
               className="h-full min-h-100 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage:
-                  "url(https://img41.rajce.idnes.cz/d4102/17/17786/17786863_359f2e36e72adb1d031cbd28330e8786/thumb/IMG_20220402_095535.jpg)",
+                backgroundImage: "url(team.jpg)",
               }}
               role="img"
               aria-hidden="true"
