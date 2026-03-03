@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { SimpleCaptcha } from "../security/captcha";
-import { hashPassword } from "../security/hash";
-import { mockAdminUser } from "../mock/adminUser";
+import { hashPassword, verifyPassword } from "../security/hash";
 
 // routes/admin/login.jsx
+// NOTE: this login page now looks up administrator accounts stored in
+// the Sanity dataset. Each user document should have a SHA‑256 hash of the
+// password in the `password` field. You can generate a hash using the
+// `hashPassword` helper (see ../security/hash.js) in the browser console or
+// via any SHA‑256 tool, then paste it into the Sanity Studio when creating
+// a new "user" document.
 export async function loader() {
   // v demo verzi jen vrátíme null
   return null;
@@ -102,31 +107,35 @@ export default function Login() {
       // Simulate async operation
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Simple comparison - in production use proper bcryptjs
-      if (username === mockAdminUser.username) {
-        const inputHash = await hashPassword(password);
-        // For demo: accept any password matching pattern
-        // In production: proper bcryptjs comparison
-        if (password === "admin123") {
-          // Store session
-          const session = {
-            user: {
-              id: mockAdminUser.id,
-              username: mockAdminUser.username,
-              email: mockAdminUser.email,
-              fullName: mockAdminUser.fullName,
-              role: mockAdminUser.role,
-            },
-            token: "demo-token-" + Date.now(),
-            expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), // 8 hours
-          };
+      // fetch user from Sanity
+      const resp = await fetch(
+        `/admin/apiUsers?username=${encodeURIComponent(username)}`,
+      );
+      if (!resp.ok) {
+        handleFailedAttempt();
+        return;
+      }
 
-          sessionStorage.setItem("adminSession", JSON.stringify(session));
-          setAttempts(0);
-          navigate("/admin/dashboard");
-        } else {
-          handleFailedAttempt();
-        }
+      const user = await resp.json();
+      if (!user || !user.password) {
+        handleFailedAttempt();
+        return;
+      }
+
+      const passwordMatch = await verifyPassword(password, user.password);
+      if (passwordMatch) {
+        // create session object based on user data
+        const session = {
+          user: {
+            id: user._id,
+            username: user.username,
+          },
+          token: "demo-token-" + Date.now(),
+          expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+        };
+        sessionStorage.setItem("adminSession", JSON.stringify(session));
+        setAttempts(0);
+        navigate("/admin/dashboard");
       } else {
         handleFailedAttempt();
       }
@@ -196,9 +205,6 @@ export default function Login() {
                 className="w-full px-4 py-2 bg-military-900 border border-olive-800 rounded text-khaki-100 placeholder-khaki-600 focus:border-olive-500 focus:outline-none disabled:opacity-50"
                 placeholder="••••••••"
               />
-              <p className="text-xs text-khaki-600 mt-1">
-                Demo: heslo je "admin123"
-              </p>
             </div>
 
             <div className="bg-military-900 border border-olive-800 rounded p-4">
@@ -222,10 +228,6 @@ export default function Login() {
               {loading ? "Přihlašuji..." : "Přihlásit se"}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-xs text-khaki-600">
-            <p>Demo účet: admin / admin123</p>
-          </div>
         </div>
       </div>
     </div>

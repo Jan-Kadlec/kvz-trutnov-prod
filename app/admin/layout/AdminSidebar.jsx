@@ -92,14 +92,6 @@ export function AdminSidebar({ open, onClose }) {
             );
           })}
         </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-olive-800 bg-military-900">
-          <div className="text-xs text-khaki-600">
-            <p className="mb-2">Demo přihlášení:</p>
-            <p className="font-mono text-khaki-500">admin</p>
-            <p className="font-mono text-khaki-500">admin123</p>
-          </div>
-        </div>
       </aside>
     </>
   );

@@ -1,6 +1,8 @@
 // Simple password hashing utility using Web Crypto API
 // For demo purposes - in production use proper bcryptjs library
 
+hashPassword("romanmares").then(console.log);
+
 export async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);

@@ -22,5 +22,6 @@ export default [
     route("apiEvents", "admin/api/events.js"),
     route("apiGallery", "admin/api/gallery.js"),
     route("apiResults", "admin/api/results.js"),
+    route("apiUsers", "admin/api/users.js"),
   ]),
 ];
