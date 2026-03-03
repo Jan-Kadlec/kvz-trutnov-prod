@@ -9,7 +9,8 @@ const EVENTS_QUERY = `
   description,
   location,
   event_date,
-  featured
+  featured,
+  "propositionUrl": proposition.asset->url
 }
 `;
 
@@ -30,6 +31,7 @@ export default function EventsSection() {
             location: item.location,
             event_date: item.event_date,
             featured: item.featured || false,
+            propositionUrl: item.propositionUrl || null,
           })),
         );
       })
@@ -128,9 +130,22 @@ export default function EventsSection() {
                       </div>
                     </div>
 
-                    <p className="text-khaki-400 leading-relaxed mb-4">
+                    <p className="text-khaki-400 leading-relaxed mb-2">
                       {event.description}
                     </p>
+
+                    {event.propositionUrl && (
+                      <p className="mb-4">
+                        <a
+                          href={event.propositionUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline text-olive-400 hover:text-olive-300 text-sm"
+                        >
+                          zobrazit propozici (PDF)
+                        </a>
+                      </p>
+                    )}
 
                     <button
                       onClick={() => setSelectedEvent(event)}
@@ -235,6 +250,19 @@ export default function EventsSection() {
                   {selectedEvent.description}
                 </p>
               </div>
+
+              {selectedEvent.propositionUrl && (
+                <div>
+                  <a
+                    href={selectedEvent.propositionUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-olive-400 underline hover:text-olive-300"
+                  >
+                    Stáhnout propozici (PDF)
+                  </a>
+                </div>
+              )}
 
               {/* Footer */}
               <div className="pt-4 border-t border-olive-800">

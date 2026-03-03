@@ -1,4 +1,19 @@
 import { writeClient } from "../sanity/client.server";
+import { Buffer } from "buffer";
+
+// helper same as in results.js
+async function uploadFileObj(fileObj, kind = "file") {
+  if (!fileObj || !fileObj.content) return null;
+  const buffer = Buffer.from(fileObj.content, "base64");
+  const asset = await writeClient.assets.upload(kind, buffer, {
+    filename: fileObj.name,
+    contentType: fileObj.type,
+  });
+  return {
+    _type: kind === "image" ? "image" : "file",
+    asset: { _type: "reference", _ref: asset._id },
+  };
+}
 
 export async function action({ request }) {
   const text = await request.text();
@@ -24,6 +39,8 @@ export async function action({ request }) {
     }
 
     if (body.type === "create") {
+      // handle file upload
+      const propositionRef = await uploadFileObj(body.proposition);
       const doc = {
         _type: "event",
         title: body.title,
@@ -32,6 +49,7 @@ export async function action({ request }) {
         event_date: body.event_date || new Date().toISOString(),
         featured: body.featured || false,
       };
+      if (propositionRef) doc.proposition = propositionRef;
       const created = await writeClient.create(doc);
       return new Response(JSON.stringify(created));
     }
@@ -41,17 +59,43 @@ export async function action({ request }) {
         return new Response(JSON.stringify({ error: "Missing id" }), {
           status: 400,
         });
+      // prepare patch data
+      const patchData = {
+        title: body.title,
+        description: body.description,
+        location: body.location,
+        event_date: body.event_date,
+        featured: body.featured || false,
+      };
+      const propositionRef = await uploadFileObj(body.proposition);
+      if (propositionRef) patchData.proposition = propositionRef;
       const updated = await writeClient
         .patch(body.id)
-        .set({
-          title: body.title,
-          description: body.description,
-          location: body.location,
-          event_date: body.event_date,
-          featured: body.featured || false,
-        })
+        .set(patchData)
         .commit();
       return new Response(JSON.stringify(updated));
+    }
+
+    // allow removing a previously attached file
+    if (body.type === "deleteAsset") {
+      if (!body.id || !body.field)
+        return new Response(JSON.stringify({ error: "Missing id or field" }), {
+          status: 400,
+        });
+      const allowed = ["proposition"];
+      if (!allowed.includes(body.field))
+        return new Response(JSON.stringify({ error: "Invalid field" }), {
+          status: 400,
+        });
+      await writeClient.patch(body.id).unset([body.field]).commit();
+      if (body.assetId && body.deleteAsset) {
+        try {
+          await writeClient.delete(body.assetId);
+        } catch (e) {
+          console.warn("Failed to delete asset:", body.assetId, e);
+        }
+      }
+      return new Response(JSON.stringify({ ok: true }));
     }
 
     return new Response(JSON.stringify({ error: "Unknown type" }), {

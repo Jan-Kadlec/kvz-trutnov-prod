@@ -5,28 +5,21 @@ export default function EventsAdmin() {
   const [events, setEvents] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location: "",
     event_date: "",
     featured: false,
+    proposition: null,
   });
 
   // ===== LOAD =====
   const loadEvents = async () => {
     const response = await fetch("/admin/apiEvents");
     const data = await response.json();
-    setEvents(
-      data.map((item) => ({
-        id: item._id,
-        title: item.title,
-        description: item.description,
-        location: item.location,
-        event_date: item.event_date,
-        featured: item.featured || false,
-      })),
-    );
+    setEvents(data.map((item) => ({ id: item._id, ...item })));
   };
 
   useEffect(() => {
@@ -41,6 +34,7 @@ export default function EventsAdmin() {
       location: item.location,
       event_date: item.event_date ? item.event_date.slice(0, 16) : "",
       featured: item.featured || false,
+      proposition: null, // only upload new if user picks file
     });
     setShowForm(true);
   };
@@ -57,6 +51,26 @@ export default function EventsAdmin() {
     setEvents((prev) => prev.filter((e) => e.id !== id));
   };
 
+  // file helpers borrowed from ResultsAdmin
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      if (!file) return resolve(null);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const makeFileObj = async (file) => {
+    if (!file) return null;
+    const content = await fileToBase64(file);
+    return { name: file.name, type: file.type, content };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -70,32 +84,45 @@ export default function EventsAdmin() {
       return;
     }
 
-    const payload = {
-      type: editingId ? "update" : "create",
-      id: editingId,
-      title: formData.title,
-      description: formData.description,
-      location: formData.location,
-      event_date: formData.event_date,
-      featured: formData.featured,
-    };
+    setLoading(true);
 
-    await fetch("/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const proposition = await makeFileObj(formData.proposition);
 
-    await loadEvents();
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({
-      title: "",
-      description: "",
-      location: "",
-      event_date: "",
-      featured: false,
-    });
+      const payload = {
+        type: editingId ? "update" : "create",
+        id: editingId,
+        title: formData.title,
+        description: formData.description,
+        location: formData.location,
+        event_date: formData.event_date,
+        featured: formData.featured,
+        proposition,
+      };
+
+      await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      await loadEvents();
+      setShowForm(false);
+      setEditingId(null);
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        event_date: "",
+        featured: false,
+        proposition: null,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Chyba při ukládání");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,6 +143,7 @@ export default function EventsAdmin() {
               location: "",
               event_date: "",
               featured: false,
+              proposition: null,
             });
             setShowForm(true);
           }}
@@ -203,6 +231,19 @@ export default function EventsAdmin() {
                 </label>
               </div>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-khaki-200 mb-1">
+                Propozice (PDF)
+              </label>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) =>
+                  setFormData({ ...formData, proposition: e.target.files[0] })
+                }
+                className="w-full px-3 py-2 bg-military-900 border border-olive-800 rounded text-khaki-100 focus:border-olive-500 focus:outline-none"
+              />
+            </div>
 
             <div className="flex gap-3">
               <button
@@ -222,6 +263,7 @@ export default function EventsAdmin() {
                     location: "",
                     event_date: "",
                     featured: false,
+                    proposition: null,
                   });
                 }}
                 className="px-4 py-2 bg-military-700 hover:bg-military-600 text-khaki-100 font-medium rounded transition-colors"
@@ -256,6 +298,44 @@ export default function EventsAdmin() {
                 {new Date(item.event_date).toLocaleDateString("cs-CZ")}
               </span>
             </div>
+            {item.proposition && item.proposition.asset && (
+              <div className="flex items-center justify-between text-xs text-khaki-600 mb-3">
+                <a
+                  href={item.proposition.asset.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline text-khaki-100 hover:text-olive-400"
+                >
+                  Stáhnout propozici
+                </a>
+                <button
+                  onClick={async () => {
+                    if (!confirm("Opravdu smazat tento soubor?")) return;
+                    setLoading(true);
+                    try {
+                      await fetch("/api/events", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          type: "deleteAsset",
+                          id: item.id,
+                          field: "proposition",
+                          assetId: item.proposition.asset._id,
+                          deleteAsset: true,
+                        }),
+                      });
+                      await loadEvents();
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded transition-colors"
+                  disabled={loading}
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button
