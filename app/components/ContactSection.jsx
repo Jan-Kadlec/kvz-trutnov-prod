@@ -5,14 +5,14 @@ export default function ContactSection() {
     {
       icon: Mail,
       label: "Email",
-      value: "info@kvztrutnov2.cz",
-      link: "mailto:info@kvztrutnov2.cz",
+      value: "v.bocarov@seznam.cz",
+      link: "mailto:v.bocarov@seznam.cz",
     },
     {
       icon: Phone,
       label: "Telefon",
-      value: "+420 123 456 789",
-      link: "tel:+420123456789",
+      value: "+420 601 571 622",
+      link: "tel:+420601571622",
     },
     {
       icon: MapPin,

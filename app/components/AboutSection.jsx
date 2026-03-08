@@ -47,29 +47,36 @@ export default function AboutSection() {
               Historie a poslání
             </h3>
             <p className="text-khaki-300 leading-relaxed mb-4">
-              Náš Klub vojáků v záloze Trutnov 2 byl založen dne 15. 12. 1995
-              oddělením od KVZ Trutnov 1 se šesti zakládajícími členy. Postupem
-              let se členská základna ustálila na počtu čtrnácti členů, mezi
-              nimiž jsou čtyři rozhodčí II. třídy a jeden rozhodčí III. třídy.
-              Již tradičně pořádáme střeleckou soutěž „Velikonoční cena“ na
-              střelnici v Hostinném a zároveň organizujeme různé sportovní a
-              společenské akce pro rodinné příslušníky. Dříve jsme se společně
-              věnovali plavání, dnes se setkáváme při bowlingu a rodinném
-              střílení.
+              Náš Klub vojáků v záloze Trutnov 2 vznikl 15. prosince 1995, kdy
+              jsme se – v dobrém a bez výstřelů – oddělili od KVZ Trutnov 1.
+              Zakládalo nás šest odvážných mužů, kteří měli chuť nejen střílet,
+              ale také vytvořit partu lidí, která drží pohromadě.
             </p>
             <p className="text-khaki-300 leading-relaxed mb-4">
-              Každoročně pořádáme přibližně sedm klubových akcí a pravidelně se
-              účastníme soutěží a aktivit dalších střeleckých klubů v okrese
-              Trutnov i mimo něj. Vlastní střelnici nemáme, proto využíváme
-              střelnice ve Střední lesnické škole v Trutnově, v Nových Lesích u
-              Dvora Králové, ve Vrchlabí a v Hostinném. Naším cílem není mít co
-              nejvíce členů, ale vytvářet menší, soudržný kolektiv, kde se dobře
-              známe nejen mezi sebou, ale i v rámci našich rodin.
+              Postupem času se naše členská základna ustálila na čtrnácti
+              členech. Mezi námi máme i odborníky přes pravidla – čtyři rozhodčí
+              II. třídy a jednoho rozhodčího III. třídy. Takže když se někdy
+              vedou debaty o zásazích, máme hned po ruce někoho, kdo to
+              rozhodne… a většinou má pravdu. Tradičně pořádáme střeleckou
+              soutěž „Velikonoční cena“ na střelnici v Hostinném. Kromě toho
+              organizujeme různé sportovní a společenské akce pro naše rodiny.
+              Dříve jsme se společně potkávali třeba v bazénu při plavání, dnes
+              dáváme přednost bowlingu a rodinnému střílení – protože nic
+              nestmelí rodinu tak jako společný terč. Každý rok pořádáme zhruba
+              tři klubové akce a pravidelně se účastníme soutěží a aktivit
+              dalších střeleckých klubů v okrese Trutnov i mimo něj. Vlastní
+              střelnici sice nemáme, ale o místa ke střílení nouzi také ne –
+              využíváme střelnice ve Střední lesnické škole v Trutnově, v Nových
+              Lesích u Dvora Králové, ve Vrchlabí a v Hostinném. Naším cílem
+              nikdy nebylo mít co největší počet členů. Mnohem důležitější je
+              pro nás menší, soudržná parta, kde se dobře známe nejen mezi
+              sebou, ale často i s rodinami ostatních.
             </p>
             <p className="text-khaki-300 leading-relaxed">
-              Jsme hrdí na naši tradici, kázeň a přátelskou atmosféru, která
-              panuje mezi našimi členy. Vítáme všechny, kdo sdílejí naši vášeň
-              pro střelbu a vojenské hodnoty.
+              Jsme hrdí na naši tradici, disciplínu a přátelskou atmosféru,
+              která v našem klubu panuje. Rádi mezi sebou přivítáme každého, kdo
+              sdílí naši vášeň pro střelbu, dobrý kolektiv a smysl pro fair
+              play."
             </p>
           </div>
 
