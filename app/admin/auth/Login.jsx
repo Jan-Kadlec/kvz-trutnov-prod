@@ -189,7 +189,7 @@ export default function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isLocked}
                 className="w-full px-4 py-2 bg-military-900 border border-olive-800 rounded text-khaki-100 placeholder-khaki-600 focus:border-olive-500 focus:outline-none disabled:opacity-50"
-                placeholder="admin"
+                placeholder="Zadejte uživatelské jméno"
               />
             </div>
 
