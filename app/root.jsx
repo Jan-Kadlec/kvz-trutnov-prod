@@ -10,6 +10,7 @@ import {
 import "./app.css";
 
 export const links = () => [
+  { rel: "canonical", href: "https://kvztrutnov2.cz/" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
