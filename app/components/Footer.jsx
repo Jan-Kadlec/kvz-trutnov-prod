@@ -140,7 +140,7 @@ export default function Footer() {
                 <div>
                   <p className="text-khaki-300 font-medium">Sídlo</p>
                   <p className="text-khaki-400 text-xs">
-                    Trutnov, Česká republika
+                    Puškinova 702, 542 32 Úpice, Česká republika
                   </p>
                 </div>
               </li>
