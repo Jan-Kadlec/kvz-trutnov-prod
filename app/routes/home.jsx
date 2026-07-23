@@ -260,7 +260,7 @@ function App() {
   }, []);
 
   return (
-    <div className=" bg-military-900">
+    <div className="w-full bg-military-900">
       <Header onNavigate={handleNavigate} currentSection={currentSection} />
       <main className="pt-20">
         <HeroSection onNavigate={handleNavigate} />
