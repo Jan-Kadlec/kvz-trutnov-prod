@@ -260,9 +260,8 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-military-900">
+    <div className=" bg-military-900">
       <Header onNavigate={handleNavigate} currentSection={currentSection} />
-
       <main className="pt-20">
         <HeroSection onNavigate={handleNavigate} />
         <AboutSection />
