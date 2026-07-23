@@ -21,7 +21,7 @@ export async function loader() {
           originalFilename
         }
       },
-      photos_url{
+      photos_url[] {
         asset->{
           _id,
           url,

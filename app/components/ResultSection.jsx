@@ -1,11 +1,33 @@
 import { useEffect, useState } from "react";
-import { FileText, Image, Download } from "lucide-react";
+import {
+  FileText,
+  Image,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
 import { client } from "../sanity/client";
 
+/**
+ * @typedef {{
+ *   id: string,
+ *   event_name: string,
+ *   event_date: string,
+ *   location: string,
+ *   proposition_pdf_url: string | null,
+ *   results_pdf_url: string | null,
+ *   photos_url: string[]
+ * }} ResultItem
+ */
+
 export default function ResultsSection() {
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(/** @type {ResultItem[]} */ ([]));
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(3);
+  const [activeGallery, setActiveGallery] = useState(
+    /** @type {{ id: string, photoIndex: number } | null} */ (null),
+  );
 
   const RESULTS_QUERY = `
 *[_type == "result"] | order(event_date desc) {
@@ -16,7 +38,11 @@ export default function ResultsSection() {
 
   "proposition_pdf_url": proposition_pdf_url.asset->url,
   "results_pdf_url": results_pdf_url.asset->url,
-  "photos_url": photos_url.asset->url
+  "photos_url": photos_url[] {
+    asset-> {
+      url
+    }
+  }
 }
 `;
 
@@ -24,8 +50,10 @@ export default function ResultsSection() {
     client
       .fetch(RESULTS_QUERY)
       .then((data) => {
-        setResults(
-          data.map((item) => ({
+        /** @type {ResultItem[]} */
+        const normalizedResults = data.map(
+          /** @param {any} item */
+          (item) => ({
             id: item._id,
 
             event_name: item.event_name,
@@ -34,14 +62,26 @@ export default function ResultsSection() {
 
             proposition_pdf_url: item.proposition_pdf_url ?? null,
             results_pdf_url: item.results_pdf_url ?? null,
-            photos_url: item.photos_url ?? null,
-          })),
+            photos_url: Array.isArray(item.photos_url)
+              ? item.photos_url
+                  .map(
+                    /** @param {any} photo */
+                    (photo) => photo?.asset?.url ?? photo?.url ?? null,
+                  )
+                  .filter(Boolean)
+              : item.photos_url
+                ? [item.photos_url]
+                : [],
+          }),
         );
+
+        setResults(normalizedResults);
       })
       .catch((err) => console.error("Chyba při načítání výsledků:", err))
       .finally(() => setLoading(false));
   }, []);
 
+  /** @param {string} dateString */
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("cs-CZ", {
@@ -49,6 +89,38 @@ export default function ResultsSection() {
       month: "long",
       year: "numeric",
     }).format(date);
+  };
+
+  const activeResult =
+    activeGallery && results.find((result) => result.id === activeGallery.id);
+  const activePhotoCount = activeResult?.photos_url?.length || 0;
+  const activePhoto =
+    activeResult?.photos_url?.[activeGallery?.photoIndex ?? 0] || null;
+
+  const goToPreviousPhoto = () => {
+    if (!activeResult || activePhotoCount === 0) return;
+    setActiveGallery((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        photoIndex:
+          prev.photoIndex > 0 ? prev.photoIndex - 1 : activePhotoCount - 1,
+      };
+    });
+  };
+
+  const goToNextPhoto = () => {
+    if (!activeResult || activePhotoCount === 0) return;
+    setActiveGallery((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        photoIndex:
+          prev.photoIndex < activePhotoCount - 1 ? prev.photoIndex + 1 : 0,
+      };
+    });
   };
 
   return (
@@ -152,19 +224,23 @@ export default function ResultsSection() {
                         )}
                       </td>
                       <td className="py-4 px-4 text-center">
-                        {result.photos_url ? (
-                          <a
-                            href={result.photos_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-olive-400 hover:text-olive-300 transition-colors"
+                        {result.photos_url.length > 0 ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setActiveGallery({
+                                id: result.id,
+                                photoIndex: 0,
+                              })
+                            }
+                            className="inline-flex items-center gap-2 rounded-full bg-olive-700/20 px-3 py-2 text-olive-400 hover:bg-olive-700/40 transition-colors"
                             aria-label={`Fotogalerie - ${result.event_name} (${formatDate(result.event_date)})`}
                           >
-                            <Image className="w-5 h-5" />
-                            <span className="sr-only">
-                              Fotogalerie: {result.event_name}
+                            <span className="text-sm font-semibold text-khaki-100">
+                              {result.photos_url.length}
                             </span>
-                          </a>
+                            <Image className="w-5 h-5" />
+                          </button>
                         ) : (
                           <span className="text-khaki-600">—</span>
                         )}
@@ -196,6 +272,60 @@ export default function ResultsSection() {
                 )}
               </div>
             )}
+
+            {activeGallery && activeResult && activePhoto ? (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+                <div className="relative w-full max-w-4xl rounded-2xl border border-olive-700 bg-military-900 p-4 shadow-2xl">
+                  <button
+                    type="button"
+                    onClick={() => setActiveGallery(null)}
+                    className="absolute right-3 top-3 rounded-full bg-military-700 p-2 text-khaki-100 hover:bg-military-600"
+                    aria-label="Zavřít galerii"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center justify-between gap-3 px-2 pb-3 pt-2">
+                    <div>
+                      <p className="text-sm text-olive-400">
+                        {activeResult.event_name}
+                      </p>
+                      <p className="text-xs text-khaki-400">
+                        {activeGallery.photoIndex + 1} / {activePhotoCount}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={goToPreviousPhoto}
+                      className="rounded-full bg-olive-700 p-3 text-khaki-100 hover:bg-olive-600"
+                      aria-label="Předchozí fotografie"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+
+                    <div className="flex-1 overflow-hidden rounded-xl bg-military-800">
+                      <img
+                        src={activePhoto}
+                        alt={`${activeResult.event_name} ${activeGallery.photoIndex + 1}`}
+                        className="max-h-[70vh] w-full object-contain"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={goToNextPhoto}
+                      className="rounded-full bg-olive-700 p-3 text-khaki-100 hover:bg-olive-600"
+                      aria-label="Další fotografie"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-8 p-6 bg-military-900 border border-olive-800 rounded-lg">
               <div className="flex items-start space-x-4">

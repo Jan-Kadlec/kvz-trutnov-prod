@@ -11,7 +11,7 @@ export default function ResultsAdmin() {
     event_date: "",
     proposition_pdf_url: null,
     results_pdf_url: null,
-    photos_url: null,
+    photos_url: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,17 @@ export default function ResultsAdmin() {
   const loadResults = async () => {
     const response = await fetch("/admin/apiResults");
     const data = await response.json();
-    setResults(data.map((item) => ({ id: item._id, ...item })));
+    setResults(
+      data.map((item) => ({
+        id: item._id,
+        ...item,
+        photos_url: Array.isArray(item.photos_url)
+          ? item.photos_url
+          : item.photos_url
+            ? [item.photos_url]
+            : [],
+      })),
+    );
   };
 
   useEffect(() => {
@@ -60,6 +70,18 @@ export default function ResultsAdmin() {
     return { name: file.name, type: file.type, content };
   };
 
+  const makeFileObjs = async (files) => {
+    const selectedFiles = Array.isArray(files) ? files : files ? [files] : [];
+    const results = [];
+
+    for (const file of selectedFiles) {
+      const fileObj = await makeFileObj(file);
+      if (fileObj) results.push(fileObj);
+    }
+
+    return results;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -67,7 +89,7 @@ export default function ResultsAdmin() {
       // Convert file inputs to base64 payloads (only if provided)
       const proposition_pdf = await makeFileObj(formData.proposition_pdf_url);
       const results_pdf = await makeFileObj(formData.results_pdf_url);
-      const photos = await makeFileObj(formData.photos_url);
+      const photos = await makeFileObjs(formData.photos_url);
 
       const payload = {
         type: editingId ? "update" : "create",
@@ -95,7 +117,7 @@ export default function ResultsAdmin() {
         event_date: "",
         proposition_pdf_url: null,
         results_pdf_url: null,
-        photos_url: null,
+        photos_url: [],
       });
     } catch (err) {
       console.error("Submit error:", err);
@@ -114,7 +136,7 @@ export default function ResultsAdmin() {
       event_date: item.event_date || "",
       proposition_pdf_url: null,
       results_pdf_url: null,
-      photos_url: null,
+      photos_url: [],
     });
     setShowForm(true);
   };
@@ -223,13 +245,17 @@ export default function ResultsAdmin() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-khaki-200 mb-1">
-                  URL Fotogalerie
+                  URL Fotogalerie (více fotografií)
                 </label>
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={(e) =>
-                    setFormData({ ...formData, photos_url: e.target.files[0] })
+                    setFormData({
+                      ...formData,
+                      photos_url: Array.from(e.target.files || []),
+                    })
                   }
                   className="w-full px-3 py-2 bg-military-900 border border-olive-800 rounded text-khaki-100 focus:border-olive-500 focus:outline-none"
                 />
@@ -261,7 +287,7 @@ export default function ResultsAdmin() {
                     event_date: "",
                     proposition_pdf_url: null,
                     results_pdf_url: null,
-                    photos_url: null,
+                    photos_url: [],
                   });
                 }}
                 className="px-4 py-2 bg-military-700 hover:bg-military-600 text-khaki-100 font-medium rounded transition-colors"
@@ -402,42 +428,52 @@ export default function ResultsAdmin() {
                   )}
                 </td>
                 <td className="py-3 px-4 text-center">
-                  {item.photos_url && item.photos_url.asset ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <a
-                        href={item.photos_url.asset.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-khaki-100 underline text-xs"
-                      >
-                        {item.photos_url.asset.originalFilename || "Stáhnout"}
-                      </a>
-                      <button
-                        onClick={async () => {
-                          if (!confirm("Opravdu smazat tento soubor?")) return;
-                          setLoading(true);
-                          try {
-                            await fetch("/api/results", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                type: "deleteAsset",
-                                id: item.id,
-                                field: "photos_url",
-                                assetId: item.photos_url.asset._id,
-                                deleteAsset: true,
-                              }),
-                            });
-                            await loadResults();
-                          } finally {
-                            setLoading(false);
-                          }
-                        }}
-                        disabled={loading}
-                        className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded transition-colors"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                  {item.photos_url && item.photos_url.length > 0 ? (
+                    <div className="flex flex-col items-center gap-2">
+                      {item.photos_url.map((photo, index) => (
+                        <div
+                          key={photo.asset?._id || photo._id || index}
+                          className="flex items-center justify-center gap-2"
+                        >
+                          <a
+                            href={photo.asset?.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-khaki-100 underline text-xs"
+                          >
+                            {photo.asset?.originalFilename || "Obrázek"}
+                          </a>
+                          <button
+                            onClick={async () => {
+                              if (!confirm("Opravdu smazat tento soubor?"))
+                                return;
+                              setLoading(true);
+                              try {
+                                await fetch("/api/results", {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify({
+                                    type: "deleteAsset",
+                                    id: item.id,
+                                    field: "photos_url",
+                                    assetId: photo.asset?._id,
+                                    deleteAsset: true,
+                                  }),
+                                });
+                                await loadResults();
+                              } finally {
+                                setLoading(false);
+                              }
+                            }}
+                            disabled={loading}
+                            className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <span className="text-khaki-600">—</span>

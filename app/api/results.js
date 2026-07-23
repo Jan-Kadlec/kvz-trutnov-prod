@@ -15,6 +15,22 @@ async function uploadFileObj(fileObj, kind = "file") {
   };
 }
 
+async function uploadFileObjs(fileObjs, kind = "file") {
+  const normalized = Array.isArray(fileObjs)
+    ? fileObjs
+    : fileObjs
+      ? [fileObjs]
+      : [];
+  const uploaded = [];
+
+  for (const fileObj of normalized) {
+    const uploadedRef = await uploadFileObj(fileObj, kind);
+    if (uploadedRef) uploaded.push(uploadedRef);
+  }
+
+  return uploaded;
+}
+
 export async function action({ request }) {
   const text = await request.text();
   let body;
@@ -42,7 +58,7 @@ export async function action({ request }) {
       // upload files (if any) and create references
       const propositionRef = await uploadFileObj(body.proposition_pdf);
       const resultsRef = await uploadFileObj(body.results_pdf);
-      const photosRef = await uploadFileObj(body.photos, "image");
+      const photosRefs = await uploadFileObjs(body.photos, "image");
 
       const doc = {
         _type: "result",
@@ -53,7 +69,7 @@ export async function action({ request }) {
 
       if (propositionRef) doc.proposition_pdf_url = propositionRef;
       if (resultsRef) doc.results_pdf_url = resultsRef;
-      if (photosRef) doc.photos_url = photosRef;
+      if (photosRefs.length > 0) doc.photos_url = photosRefs;
 
       const created = await writeClient.create(doc);
       return new Response(JSON.stringify(created));
@@ -74,11 +90,11 @@ export async function action({ request }) {
 
       const propositionRef = await uploadFileObj(body.proposition_pdf);
       const resultsRef = await uploadFileObj(body.results_pdf);
-      const photosRef = await uploadFileObj(body.photos, "image");
+      const photosRefs = await uploadFileObjs(body.photos, "image");
 
       if (propositionRef) patchData.proposition_pdf_url = propositionRef;
       if (resultsRef) patchData.results_pdf_url = resultsRef;
-      if (photosRef) patchData.photos_url = photosRef;
+      if (photosRefs.length > 0) patchData.photos_url = photosRefs;
 
       const updated = await writeClient.patch(body.id).set(patchData).commit();
       return new Response(JSON.stringify(updated));
@@ -97,8 +113,31 @@ export async function action({ request }) {
           status: 400,
         });
 
-      // Unset the field on the document
-      await writeClient.patch(body.id).unset([body.field]).commit();
+      if (body.field === "photos_url" && body.assetId) {
+        const currentDoc = await writeClient.getDocument(body.id);
+        const currentPhotos = Array.isArray(currentDoc?.photos_url)
+          ? currentDoc.photos_url
+          : currentDoc?.photos_url
+            ? [currentDoc.photos_url]
+            : [];
+
+        const remainingPhotos = currentPhotos.filter((photo) => {
+          const photoAssetId = photo?.asset?._ref || photo?._ref;
+          return photoAssetId !== body.assetId;
+        });
+
+        if (remainingPhotos.length > 0) {
+          await writeClient
+            .patch(body.id)
+            .set({ photos_url: remainingPhotos })
+            .commit();
+        } else {
+          await writeClient.patch(body.id).unset([body.field]).commit();
+        }
+      } else {
+        // Unset the field on the document
+        await writeClient.patch(body.id).unset([body.field]).commit();
+      }
 
       // Optionally delete the asset document by its id (e.g., "file-..." or "image-...")
       if (body.assetId && body.deleteAsset) {
