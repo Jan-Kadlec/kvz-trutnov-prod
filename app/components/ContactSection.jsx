@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, FileText } from "lucide-react";
 
 export default function ContactSection() {
   const contactInfo = [
@@ -17,7 +17,13 @@ export default function ContactSection() {
     {
       icon: MapPin,
       label: "Adresa",
-      value: "Trutnov, Královéhradecký kraj",
+      value: "Puškinova 702, 542 32 Úpice",
+      link: null,
+    },
+    {
+      icon: FileText,
+      label: "IČO",
+      value: "64201864",
       link: null,
     },
   ];
